@@ -1,0 +1,7 @@
+# Mínimo para ejecutar el sistema
+flask>=3.0
+
+# Opcionales
+# stripe>=8        # cobros reales con Stripe (con STRIPE_SECRET_KEY); sin él, el pago funciona en modo simulado
+# bcrypt>=4        # solo si quieres MODO_CONTRASENA=bcrypt (verificar hashes bcrypt existentes)
+# waitress>=3      # servidor de producción:  waitress-serve --listen=0.0.0.0:5001 app:app

@@ -1,0 +1,329 @@
+/* ==========================================================
+   3. CONTENEDORES DE NOTIFICACIONES (uno por posición)
+   Son cajas fijas en la pantalla donde se apilan las notificaciones.
+   ========================================================== */
+.ntf-stack {
+    position: fixed;
+    z-index: 9999;
+    width: min(380px, 100vw);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none; /* deja pasar los clics a la página */
+}
+
+/* Posiciones. --dx y --dy indican desde dónde "entra" la notificación */
+.ntf-stack[data-pos='top-right'] {
+    top: 0;
+    right: 0;
+    --dx: 60px;
+    --dy: 0px;
+}
+.ntf-stack[data-pos='top-left'] {
+    top: 0;
+    left: 0;
+    --dx: -60px;
+    --dy: 0px;
+}
+.ntf-stack[data-pos='top-center'] {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    --dx: 0px;
+    --dy: -24px;
+}
+.ntf-stack[data-pos='bottom-right'] {
+    bottom: 0;
+    right: 0;
+    --dx: 60px;
+    --dy: 0px;
+    flex-direction: column-reverse;
+}
+.ntf-stack[data-pos='bottom-left'] {
+    bottom: 0;
+    left: 0;
+    --dx: -60px;
+    --dy: 0px;
+    flex-direction: column-reverse;
+}
+.ntf-stack[data-pos='bottom-center'] {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    --dx: 0px;
+    --dy: 24px;
+    flex-direction: column-reverse;
+}
+
+/* ==========================================================
+   4. CAJA QUE COLAPSA AL CERRAR
+   Truco: al cerrar, la altura pasa de 1fr a 0fr con transición.
+   Así las demás notificaciones suben/bajan suavemente.
+   ========================================================== */
+.ntf-wrap {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.35s ease;
+}
+
+.ntf-wrap.saliendo {
+    grid-template-rows: 0fr;
+}
+
+.ntf-inner {
+    min-height: 0;
+    overflow: hidden;
+    padding: 6px; /* espacio para que no se corte la sombra */
+    margin: -6px;
+}
+
+.ntf-inner > .ntf {
+    margin-bottom: 10px; /* separación entre notificaciones */
+}
+
+/* ==========================================================
+   5. LA NOTIFICACIÓN
+   ========================================================== */
+.ntf {
+    --color: var(--azul); /* color por defecto (info) */
+
+    position: relative;
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* ícono | texto | botón cerrar */
+    gap: 12px;
+    align-items: start;
+
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    padding: 14px 14px 16px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+
+    touch-action: pan-y; /* permite arrastrar de lado en el celular */
+    user-select: none;
+
+    /* Animación de entrada */
+    animation: entrar 0.55s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+    transition:
+        opacity 0.3s,
+        transform 0.35s ease;
+}
+
+/* Barrita de color a la izquierda */
+.ntf::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--color);
+}
+
+/* Un color distinto por cada tipo */
+.ntf.success {
+    --color: var(--verde);
+}
+.ntf.error {
+    --color: var(--rojo);
+}
+.ntf.warning {
+    --color: var(--naranja);
+}
+.ntf.info {
+    --color: var(--azul);
+}
+
+/* Animación de salida: se desvanece y se encoge un poco */
+.ntf-wrap.saliendo .ntf {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.92);
+}
+
+/* Clases que usa el JavaScript mientras arrastras */
+.ntf.arrastrando {
+    transition: none;
+    animation: none;
+}
+.ntf.regresando {
+    transition: transform 0.35s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+.ntf.lanzada {
+    transition:
+        transform 0.25s ease-in,
+        opacity 0.25s;
+}
+
+/* Animación de entrada: aparece desde el lado con un pequeño rebote */
+@keyframes entrar {
+    0% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) scale(0.85);
+    }
+    60% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ==========================================================
+   6. PARTES INTERNAS: ícono, texto, botones, barra de progreso
+   ========================================================== */
+.ntf-icono {
+    width: 32px;
+    height: 32px;
+    margin-left: 2px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    color: var(--color);
+    background: color-mix(in srgb, var(--color) 14%, transparent);
+}
+
+.ntf-icono svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* El ícono se "dibuja" solo al aparecer */
+.ntf-icono path {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: dibujar 0.5s 0.25s ease-out forwards;
+}
+
+@keyframes dibujar {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.ntf-texto {
+    min-width: 0;
+}
+
+.ntf-titulo {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.ntf-mensaje {
+    margin-top: 3px;
+    color: var(--texto-suave);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* Botones de acción dentro de la notificación */
+.ntf-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.ntf-acciones button {
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: inherit;
+    background: transparent;
+    border: 1.5px solid var(--borde);
+    border-radius: 9px;
+    padding: 5px 11px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ntf-acciones button:first-child {
+    color: var(--color);
+    border-color: var(--color);
+}
+
+.ntf-acciones button:hover {
+    background: color-mix(in srgb, var(--color) 12%, transparent);
+}
+
+/* Botón X para cerrar */
+.ntf-cerrar {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--texto-suave);
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        transform 0.2s;
+}
+
+.ntf-cerrar:hover {
+    background: color-mix(in srgb, var(--texto) 9%, transparent);
+    color: var(--texto);
+    transform: rotate(90deg);
+}
+
+/* Barra de progreso (tiempo que queda) */
+.ntf-barra {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: color-mix(in srgb, var(--color) 18%, transparent);
+}
+
+.ntf-barra i {
+    display: block;
+    height: 100%;
+    background: var(--color);
+    transform-origin: left;
+    animation: vaciar linear forwards; /* la duración la pone el JS */
+}
+
+@keyframes vaciar {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* Al pasar el cursor, la barra se pausa */
+.ntf:hover .ntf-barra i,
+.ntf:focus-within .ntf-barra i,
+.ntf.arrastrando .ntf-barra i {
+    animation-play-state: paused;
+}
+
+/* Accesibilidad: foco visible con teclado */
+.btn:focus-visible,
+select:focus-visible,
+.ntf:focus-visible,
+.ntf button:focus-visible {
+    outline: 2px solid var(--azul);
+    outline-offset: 2px;
+}
+
+/* Si el usuario pidió menos animaciones, las reducimos */
+@media (prefers-reduced-motion: reduce) {
+    .ntf {
+        animation: none;
+    }
+    .ntf,
+    .ntf-wrap {
+        transition-duration: 0.01s;
+    }
+    .ntf-icono path {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}

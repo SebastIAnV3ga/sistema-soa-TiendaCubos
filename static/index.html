@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GESE CUBES · Tienda de cubos Rubik</title>
+  <link rel="stylesheet" href="/css/estilo.css">
+  <link rel="stylesheet" href="/css/notify.css">
+</head>
+<body>
+  <header class="barra">
+    <a class="marca" href="#/tienda" aria-label="GESE CUBES, inicio"><span class="marca-icono" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>GESE <span>CUBES</span></a>
+    <nav id="nav-principal" class="nav" aria-label="Principal"></nav>
+    <div class="buscar" role="search">
+      <input id="buscador" type="search" aria-label="Buscar cubos" placeholder="Buscar cubo, marca o tamaño…" list="sugerencias" autocomplete="off">
+      <datalist id="sugerencias"></datalist>
+    </div>
+    <div class="barra-der">
+      <button id="btn-campana" class="icono-btn" aria-label="Notificaciones" hidden>
+        <span aria-hidden="true">🔔</span><span id="contador" class="contador" hidden>0</span>
+      </button>
+      <a id="btn-carrito" class="icono-btn" href="#/carrito" aria-label="Carrito"><span aria-hidden="true">🛒</span><span id="contador-carrito" class="contador" hidden>0</span></a>
+      <a id="btn-cuenta" class="boton boton-sec" href="#/cuenta">Entrar</a>
+    </div>
+  </header>
+  <div class="cuerpo">
+    <aside id="lateral" class="lateral" aria-label="Sección" hidden></aside>
+    <main id="vista" class="vista" tabindex="-1"></main>
+  </div>
+  <div id="modal" class="modal" hidden></div>
+  <script src="/js/notify.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/tienda.js"></script>
+  <script src="/js/pedidos.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/acciones.js"></script>
+</body>
+</html>
