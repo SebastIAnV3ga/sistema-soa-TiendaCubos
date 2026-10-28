@@ -2,6 +2,7 @@
 
 Catálogo de cubos de GESE CUBES. Usuarios demo: ver README.
 """
+import os
 from datetime import datetime, timedelta, timezone
 
 from core.seguridad import hashear_contrasena
@@ -82,11 +83,13 @@ def cargar(c):
     # Usuarios demo -----------------------------------------------------------
     c.execute(
         "INSERT INTO usuarios(nombre, apellidos, email, password_hash, rol, fecha_registro) VALUES (?,?,?,?,?,?)",
-        ("Administrador", "GESE Cubes", "admin@gesecubes.mx", hashear_contrasena("Admin123!"), "admin", ahora),
+        ("Administrador", "GESE Cubes", "admin@gesecubes.mx",
+         hashear_contrasena(os.getenv("ADMIN_PASSWORD", "Admin123!")), "admin", ahora),
     )
     c.execute(
         "INSERT INTO usuarios(nombre, apellidos, email, password_hash, rol, fecha_registro) VALUES (?,?,?,?,?,?)",
-        ("Ana", "López", "ana@correo.com", hashear_contrasena("Cliente123!"), "cliente", ahora),
+        ("Ana", "López", "ana@correo.com",
+         hashear_contrasena(os.getenv("DEMO_CUSTOMER_PASSWORD", "Cliente123!")), "cliente", ahora),
     )
     c.execute(
         "INSERT INTO perfiles(usuario_id, telefono, actualizado) VALUES (2, '+52 669 111 2233', ?)", (ahora,)

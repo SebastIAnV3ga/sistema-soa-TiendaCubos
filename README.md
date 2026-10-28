@@ -15,6 +15,22 @@ python app.py                       # abre http://127.0.0.1:5001
 
 En Windows: doble clic a `iniciar.bat`. Las pruebas automáticas: `python -m unittest discover -s tests -v`.
 
+## Publicar la tienda en Render
+
+GitHub Pages solo sirve archivos estáticos; no puede ejecutar Flask ni la base de datos. Para publicar la tienda
+completa, este repositorio incluye `render.yaml`:
+
+1. En Render, crea un **Blueprint** y conecta este repositorio de GitHub.
+2. Confirma la configuración gratuita definida en `render.yaml` y despliega.
+3. Abre la URL `onrender.com` que Render muestra para el servicio.
+
+El plan gratuito puede suspender el servicio cuando no se usa y su almacenamiento es temporal: las cuentas,
+productos y pedidos de SQLite pueden reiniciarse al reiniciar o volver a desplegar. Los pagos siguen en modo
+simulado hasta que configures las credenciales de una pasarela real. La URL de GitHub Pages no ejecutará esta
+aplicación Flask. Render genera contraseñas aleatorias para las cuentas iniciales; consúltalas en las variables
+`ADMIN_PASSWORD` y `DEMO_CUSTOMER_PASSWORD` del servicio. En local siguen vigentes las credenciales de demostración
+indicadas abajo.
+
 **Usuarios de demostración** (se crean la primera vez; cámbialos antes de publicar el sistema):
 
 | Rol | Correo | Contraseña |

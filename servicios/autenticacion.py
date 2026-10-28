@@ -3,6 +3,8 @@
 Mismas rutas y respuestas `{exito, mensaje, datos}`. La "tienda" de usuarios
 que el original consultaba por HTTP es ahora el servicio de Registro.
 """
+import os
+
 from flask import Blueprint, jsonify, request
 
 from core import seguridad
@@ -10,6 +12,7 @@ from core.util import EMAIL_RE, requiere_sesion, usuario_de_sesion
 from servicios import registro
 
 bp = Blueprint("autenticacion", __name__, url_prefix="/api/autenticacion")
+COOKIE_SECURE = os.getenv("SECURE_COOKIES", "").lower() in {"1", "true", "yes"}
 
 
 def _resp(status, exito, mensaje, datos=None):
@@ -51,7 +54,7 @@ def iniciar_sesion():
     respuesta, status = _resp(
         200, True, f"Has inciado sesión como {usuario['nombre']}", _usuario_publico(usuario)
     )
-    respuesta.set_cookie("token", token, httponly=True, secure=False, samesite="Lax", path="/", max_age=3600)
+    respuesta.set_cookie("token", token, httponly=True, secure=COOKIE_SECURE, samesite="Lax", path="/", max_age=3600)
     return respuesta, status
 
 
@@ -69,7 +72,7 @@ def cerrar_sesion():
     if token and "error" not in seguridad.validar_token(token):
         seguridad.tokens_invalidos.add(token)
     respuesta, status = _resp(200, True, "Sesión cerrada.")
-    respuesta.delete_cookie("token", path="/", httponly=True, samesite="Lax")
+    respuesta.delete_cookie("token", path="/", httponly=True, secure=COOKIE_SECURE, samesite="Lax")
     return respuesta, status
 
 
